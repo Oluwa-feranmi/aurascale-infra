@@ -1,0 +1,93 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Resources:
+
+  EksClusterRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-EksClusterRole"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: eks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+      PermissionsBoundary: !Ref PermissionBoundary
+
+  EksNodegroupRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-EksNodegroupRole"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+      PermissionsBoundary: !Ref PermissionBoundary
+
+  AuraScaleDevRead:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: !Sub "${AWS::StackName}-AuraScaleDevRead"
+      Policies:
+        - PolicyName: !Sub "${AWS::StackName}-AuraScaleDevReadPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:Describe*
+                  - eks:Describe*
+                  - eks:List*
+                Resource: "*"
+
+  EksNodeInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub "${AWS::StackName}-EksNodeInstanceProfile"
+      Roles:
+        - !Ref EksNodegroupRole
+
+  PermissionBoundary:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${AWS::StackName}-PermissionBoundary"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: "*"
+            Resource: "*"
+          - Effect: Deny
+            Action:
+              - iam:*
+              - ec2:DeleteVpc
+            Resource: "*"
+
+Outputs:
+  EksClusterRoleArn:
+    Description: EKS Cluster Role ARN
+    Value: !GetAtt EksClusterRole.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-EksClusterRoleArn"
+
+  EksNodegroupRoleArn:
+    Description: EKS Nodegroup Role ARN
+    Value: !GetAtt EksNodegroupRole.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-EksNodegroupRoleArn"
+
+  EksNodeInstanceProfileName:
+    Description: EKS Node Instance Profile Name
+    Value: !Ref EksNodeInstanceProfile
+    Export:
+      Name: !Sub "${AWS::StackName}-EksNodeInstanceProfileName"

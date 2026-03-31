@@ -1,0 +1,53 @@
+name: AuraScale Infrastructure Pipeline
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-vpc:
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v3
+        - name: Configure AWS Credentials
+          uses: aws-actions/configure-aws-credentials@v2
+          with:
+            role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+            aws-region: eu-west-1
+        - name: Deploy VPC
+          uses: aws-actions/aws-cloudformation-github-deploy@v1
+          with:
+            name: aurascale-vpc
+            template: vpc/vpc.yaml
+
+    deploy-iam:
+        needs: deploy-vpc
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - name: Configure AWS Credentials
+              uses: aws-actions/configure-aws-credentials@v2
+              with:
+                role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+                aws-region: eu-west-1
+            - name: Deploy IAM
+              uses: aws-actions/aws-cloudformation-github-deploy@v1
+              with:
+                name: aurascale-iam
+                template: iam/oidc-provider.yaml
+
+    deploy-eks:
+        needs: deploy-iam
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - name: Configure AWS Credentials
+              uses: aws-actions/configure-aws-credentials@v2
+              with:
+                role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+                aws-region: eu-west-1
+            - name: Deploy EKS Cluster
+              uses: aws-actions/aws-cloudformation-github-deploy@v1
+              with:
+                name: aurascale-eks
+                template: eks/eks-cluster.yaml

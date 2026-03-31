@@ -1,0 +1,101 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "EKS Cluster"
+
+Parameters:
+  ClusterName:
+    Description: EKS Cluster name
+    Type: String
+    Default: aurascale-control-plane
+
+  VpcStackName:
+    Description: Name of the VPC stack to import values from
+    Type: String
+    Default: aurascale-vpc
+
+  IamStackName:
+    Description: Name of the IAM stack to import values from
+    Type: String
+    Default: aurascale-iam
+
+  Environment:
+    Description: The environment name
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - test
+      - prod
+
+Resources:
+
+  EKSClusterSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Cluster communication with worker nodes
+      VpcId: !ImportValue
+        Fn::Sub: "${VpcStackName}-vpcid"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+          Description: Allow HTTPS traffic to EKS API server
+        - IpProtocol: "-1"
+          FromPort: -1
+          ToPort: -1
+          SourceSecurityGroupId: !Ref EKSClusterSecurityGroup
+          Description: Allow all traffic within the cluster security group
+      Tags:
+        - Key: Name
+          Value: !Sub "${ClusterName}-cluster-sg"
+
+  EKSCluster:
+    Type: AWS::EKS::Cluster
+    Properties:
+      Name: aurascale-control-plane
+      RoleArn: !ImportValue
+        Fn::Sub: "${IamStackName}-EksClusterRoleArn"
+      Version: "1.31"
+      ResourcesVpcConfig:
+        EndpointPrivateAccess: true
+        EndpointPublicAccess: true
+        SecurityGroupIds:
+          - !Ref EKSClusterSecurityGroup
+        SubnetIds:
+          - !ImportValue
+            Fn::Sub: "${VpcStackName}-private-subnet-id"
+          - !ImportValue
+            Fn::Sub: "${VpcStackName}-private-subnet-2-id"
+          - !ImportValue
+            Fn::Sub: "${VpcStackName}-private-subnet-3-id"
+      Logging:
+        ClusterLogging:
+          EnabledTypes:
+            - Type: api
+            - Type: audit
+            - Type: authenticator
+
+Outputs:
+  EKSClusterName:
+    Description: EKS Cluster Name
+    Value: !Ref EKSCluster
+    Export:
+      Name: !Sub "${AWS::StackName}-EKSClusterName"
+
+  EKSClusterArn:
+    Description: EKS Cluster ARN
+    Value: !GetAtt EKSCluster.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-EKSClusterArn"
+
+  EKSClusterEndpoint:
+    Description: EKS Cluster Endpoint
+    Value: !GetAtt EKSCluster.Endpoint
+    Export:
+      Name: !Sub "${AWS::StackName}-EKSClusterEndpoint"
+
+  EKSClusterSecurityGroupId:
+    Description: EKS Cluster Security Group ID
+    Value: !Ref EKSClusterSecurityGroup
+    Export:
+      Name: !Sub "${AWS::StackName}-EKSClusterSecurityGroupId"

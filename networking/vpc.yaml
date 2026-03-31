@@ -1,0 +1,402 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  ProjectName:
+    Description: Please enter the project name
+    Type: String
+    Default: aurascale
+  
+  vpc:
+    Description: Please enter vpc CIDR
+    Type: String
+    Default: 10.0.0.0/16
+  
+  igw:
+    Description: Please enter IGW name
+    Type: String
+    Default: aurascale-igw
+    
+  publicsubnetA:
+    Description: Please enter public subnet A CIDR
+    Type: String
+    Default: 10.0.1.0/24
+
+  publicsubnetB:
+    Description: Please enter public subnet B CIDR
+    Type: String
+    Default: 10.0.2.0/24
+
+  publicsubnetC:
+    Description: Please enter public subnet C CIDR
+    Type: String
+    Default: 10.0.3.0/24
+
+  privatesubnet:
+    Description: Please enter private subnet CIDR
+    Type: String
+    Default: 10.0.16.0/20
+
+  privatesubnet2:
+    Description: Please enter private subnet 2 CIDR
+    Type: String
+    Default: 10.0.32.0/20
+
+  privatesubnet3:
+    Description: Please enter private subnet 3 CIDR
+    Type: String
+    Default: 10.0.48.0/20
+
+  datasubnet:
+    Description: Please enter data subnet CIDR
+    Type: String
+    Default: 10.0.7.0/24
+
+  datasubnet2:
+    Description: Please enter data subnet 2 CIDR
+    Type: String
+    Default: 10.0.8.0/24
+
+  datasubnet3:
+    Description: Please enter data subnet 3 CIDR
+    Type: String
+    Default: 10.0.9.0/24
+    
+  
+Resources:
+
+  # Create VPC
+  AurascaleVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref vpc
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Ref ProjectName
+
+  # Create Internet Gateway
+  AurascaleIGW:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Ref igw
+
+  # Attach Internet Gateway to VPC
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref AurascaleIGW
+      VpcId: !Ref AurascaleVPC
+
+  # Create Public Subnet
+  PublicSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref AurascaleVPC
+      CidrBlock: !Ref publicsubnetA
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-public-subnet-a"
+        - Key: "kubernetes.io/role/elb"
+          Value: "1"
+  
+  PublicSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref AurascaleVPC
+      CidrBlock: !Ref publicsubnetB
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-public-subnet-b"
+        - Key: "kubernetes.io/role/elb"
+          Value: "1"
+  PublicSubnetC:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref AurascaleVPC
+      CidrBlock: !Ref publicsubnetC
+      AvailabilityZone: !Select [2, !GetAZs ""]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-public-subnet-c"
+        - Key: "kubernetes.io/role/elb"
+          Value: "1"
+
+  # Create Private Subnet
+  PrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref AurascaleVPC
+      CidrBlock: !Ref privatesubnet
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-private-subnet"
+        - Key: "kubernetes.io/role/internal-elb"
+          Value: "1"
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref AurascaleVPC
+      CidrBlock: !Ref privatesubnet2
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-private-subnet-2"
+        - Key: "kubernetes.io/role/internal-elb"
+          Value: "1"
+
+  PrivateSubnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref AurascaleVPC
+      CidrBlock: !Ref privatesubnet3
+      AvailabilityZone: !Select [2, !GetAZs ""]
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-private-subnet-3"
+        - Key: "kubernetes.io/role/internal-elb"
+          Value: "1"
+
+  # Create Data Subnet
+  DataSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref AurascaleVPC
+      CidrBlock: !Ref datasubnet
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-data-subnet"
+        - Key: "kubernetes.io/role/internal-elb"
+          Value: "1"
+
+  DataSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref AurascaleVPC
+      CidrBlock: !Ref datasubnet2
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-data-subnet-2"
+        - Key: "kubernetes.io/role/internal-elb"
+          Value: "1"
+
+  DataSubnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref AurascaleVPC
+      CidrBlock: !Ref datasubnet3
+      AvailabilityZone: !Select [2, !GetAZs ""]
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-data-subnet-3"
+        - Key: "kubernetes.io/role/internal-elb"
+          Value: "1"
+
+  NATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt ElasticIP.AllocationId
+      SubnetId: !Ref PublicSubnetA
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-nat-gateway"
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref AurascaleVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-private-route-table"
+
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NATGateway
+
+  PrivateSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnet
+
+  PrivateSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnet2
+
+  PrivateSubnet3RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnet3
+          
+  ElasticIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-elastic-ip"
+
+  # Create Public Route Table
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref AurascaleVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-public-route-table"
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref AurascaleIGW
+
+  PublicSubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnetA
+
+  PublicSubnetBRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnetB
+
+  PublicSubnetCRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnetC
+
+  # Create Data Route Table
+  DataRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref AurascaleVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-data-route-table"
+
+  DataSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref DataRouteTable
+      SubnetId: !Ref DataSubnet
+
+  DataSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref DataRouteTable
+      SubnetId: !Ref DataSubnet2
+
+  DataSubnet3RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref DataRouteTable
+      SubnetId: !Ref DataSubnet3
+
+Outputs:
+  VPCID:
+    Description: VPC ID
+    Value: !Ref AurascaleVPC
+    Export:
+      Name: !Sub "${ProjectName}-vpcid"
+
+  PublicSubnetAID:
+    Description: Public Subnet A ID
+    Value: !Ref PublicSubnetA
+    Export:
+      Name: !Sub "${ProjectName}-public-subnet-a-id"
+
+  PublicSubnetBID:
+    Description: Public Subnet B ID
+    Value: !Ref PublicSubnetB
+    Export:
+      Name: !Sub "${ProjectName}-public-subnet-b-id"
+
+  PublicSubnetCID:
+    Description: Public Subnet C ID
+    Value: !Ref PublicSubnetC
+    Export:
+      Name: !Sub "${ProjectName}-public-subnet-c-id"
+
+  PrivateSubnetID:
+    Description: Private Subnet ID
+    Value: !Ref PrivateSubnet
+    Export:
+      Name: !Sub "${ProjectName}-private-subnet-id"
+
+  PrivateSubnet2ID:
+    Description: Private Subnet 2 ID
+    Value: !Ref PrivateSubnet2
+    Export:
+      Name: !Sub "${ProjectName}-private-subnet-2-id"
+
+  PrivateSubnet3ID:
+    Description: Private Subnet 3 ID
+    Value: !Ref PrivateSubnet3
+    Export:
+      Name: !Sub "${ProjectName}-private-subnet-3-id"
+
+  DataSubnetID:
+    Description: Data Subnet ID
+    Value: !Ref DataSubnet
+    Export:
+      Name: !Sub "${ProjectName}-data-subnet-id"
+
+  DataSubnet2ID:
+    Description: Data Subnet 2 ID
+    Value: !Ref DataSubnet2
+    Export:
+      Name: !Sub "${ProjectName}-data-subnet-2-id"
+
+  DataSubnet3ID:
+    Description: Data Subnet 3 ID
+    Value: !Ref DataSubnet3
+    Export:
+      Name: !Sub "${ProjectName}-data-subnet-3-id"
+
+  PublicRouteTableID:
+    Description: Public Route Table ID
+    Value: !Ref PublicRouteTable
+    Export:
+      Name: !Sub "${ProjectName}-public-route-table-id"
+
+  PrivateRouteTableID:
+    Description: Private Route Table ID
+    Value: !Ref PrivateRouteTable
+    Export:
+      Name: !Sub "${ProjectName}-private-route-table-id"
+
+  DataRouteTableID:
+    Description: Data Route Table ID
+    Value: !Ref DataRouteTable
+    Export:
+      Name: !Sub "${ProjectName}-data-route-table-id"

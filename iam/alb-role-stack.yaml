@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Service Account for AWS Load Balancer Controller
+
+Parameters:
+  ClusterStackName:
+    Type: String
+    Default: aurascale-control-plane
+    Description: The name of the EKS cluster stack to import values from
+  IamStackName:
+    Type: String
+    Default: aurascale-iam
+    Description: The name of the IAM stack to import values from
+  
+Resources:
+  ALBControllerServiceAccount:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ClusterStackName}-alb-controller-sa"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !ImportValue
+                Fn::Sub: "${IamStackName}-OIDCProviderArn"
+            Action:
+              - sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                !Sub "${IamStackName}-OIDCProviderUrl:sub": "system:serviceaccount:kube-system:aws-load-balancer-controller"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSLoadBalancerControllerIAMPolicy
+
+Outputs:
+  ALBControllerRoleArn:
+    Value: !GetAtt ALBControllerServiceAccount.Arn
+    Export:
+      Name: !Sub "${ClusterStackName}-ALBControllerRoleArn"

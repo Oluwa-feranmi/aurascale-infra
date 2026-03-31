@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: EKS Nodegroup
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, test, prod]
+    Description: The environment name
+  AmiType:
+    Type: String
+    Default: AL2_x86_64
+    AllowedValues: [AL2_x86_64, AL2_ARM_64]
+    Description: The AMI type for the node instances
+  CapacityType:
+    Type: String
+    Default: ON_DEMAND
+    AllowedValues: [ON_DEMAND, SPOT]
+    Description: The capacity type for the node instances
+  Workload:
+    Type: String
+    Default: general
+    AllowedValues: [general, cpu, gpu]
+    Description: The workload type for the node instances
+  ClusterStackName:
+    Type: String
+    Default: aurascale-control-plane
+    Description: The name of the EKS cluster stack to import values from
+  IamStackName:
+    Type: String
+    Default: aurascale-iam
+    Description: The name of the IAM stack to import values from
+  VpcStackName:
+    Type: String
+    Default: aurascale
+    Description: The name of the VPC stack to import values from
+  NodeInstanceType:
+    Type: String
+    Default: t3.medium
+    Description: The instance type for the node instances
+
+Resources:
+  EKSNodeGroup:
+    Type: AWS::EKS::Nodegroup
+    Properties:
+      ClusterName: !ImportValue
+        Fn::Sub: "${ClusterStackName}-EKSClusterName"
+      NodeRole: !ImportValue
+        Fn::Sub: "${IamStackName}-EksNodegroupRoleArn"
+      ScalingConfig:
+        MinSize: 2
+        MaxSize: 5
+        DesiredSize: 2
+      DiskSize: 20
+      InstanceTypes:
+        - !Ref NodeInstanceType
+      AmiType: !Ref AmiType
+      CapacityType: !Ref CapacityType
+      Subnets:
+        - !ImportValue
+          Fn::Sub: "${VpcStackName}-private-subnet-id"
+        - !ImportValue
+          Fn::Sub: "${VpcStackName}-private-subnet-2-id"
+        - !ImportValue
+          Fn::Sub: "${VpcStackName}-private-subnet-3-id"
+      Tags:
+        Environment: !Ref Environment
+        Workload: !Ref Workload
+        Name: !Sub "${Environment}-${Workload}-nodes"
