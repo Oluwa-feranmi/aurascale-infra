@@ -23,7 +23,7 @@ jobs:
         with:
           name: aurascale-vpc
           template: networking/vpc.yaml
-          no-fail-on-empty-changeset: true
+          no-fail-on-empty-changeset: "1"
 
   deploy-iam:
     needs: deploy-vpc
