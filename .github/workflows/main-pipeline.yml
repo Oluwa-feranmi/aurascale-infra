@@ -22,7 +22,7 @@ jobs:
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: aurascale-vpc
-          template: vpc/vpc.yaml
+          template: networking/vpc.yaml
 
   deploy-iam:
     needs: deploy-vpc
@@ -54,4 +54,4 @@ jobs:
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: aurascale-eks
-          template: eks/eks-cluster.yaml
+          template: clusters/eks-cluster.yaml
