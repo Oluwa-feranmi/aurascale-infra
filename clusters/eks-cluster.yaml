@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "EKS Cluster"
+Description: "EKS Cluster with Integrated OIDC Provider"
 
 Parameters:
   ClusterName:
@@ -27,12 +27,12 @@ Parameters:
       - prod
 
 Resources:
-
+  # --- YOUR ORIGINAL SECURITY GROUP ---
   EKSClusterSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Cluster communication with worker nodes
-      VpcId: !ImportValue
+      VpcId: !ImportValue 
         Fn::Sub: "${VpcStackName}-vpcid"
       SecurityGroupIngress:
         - IpProtocol: tcp
@@ -49,11 +49,12 @@ Resources:
         - Key: Name
           Value: !Sub "${ClusterName}-cluster-sg"
 
+  # --- YOUR ORIGINAL EKS CLUSTER ---
   EKSCluster:
     Type: AWS::EKS::Cluster
     Properties:
-      Name: aurascale-control-plane
-      RoleArn: !ImportValue
+      Name: !Ref ClusterName
+      RoleArn: !ImportValue 
         Fn::Sub: "${IamStackName}-EksClusterRoleArn"
       Version: "1.31"
       ResourcesVpcConfig:
@@ -62,12 +63,12 @@ Resources:
         SecurityGroupIds:
           - !Ref EKSClusterSecurityGroup
         SubnetIds:
-          - !ImportValue
-            Fn::Sub: "${VpcStackName}-private-subnet-id"
-          - !ImportValue
-            Fn::Sub: "${VpcStackName}-private-subnet-2-id"
-          - !ImportValue
-            Fn::Sub: "${VpcStackName}-private-subnet-3-id"
+          - !ImportValue 
+              Fn::Sub: "${VpcStackName}-private-subnet-id"
+          - !ImportValue 
+              Fn::Sub: "${VpcStackName}-private-subnet-2-id"
+          - !ImportValue 
+              Fn::Sub: "${VpcStackName}-private-subnet-3-id"
       Logging:
         ClusterLogging:
           EnabledTypes:
@@ -75,7 +76,18 @@ Resources:
             - Type: audit
             - Type: authenticator
 
+  # --- NEW: THE INTEGRATED OIDC PROVIDER ---
+  OIDCProvider:
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      Url: !GetAtt EKSCluster.OpenIdConnectIssuerUrl
+      ClientIDList:
+        - sts.amazonaws.com
+      ThumbprintList:
+        - 9e99a48a9960b14926bb7f3b02e22da2b0ab7280
+
 Outputs:
+  # --- YOUR ORIGINAL OUTPUTS ---
   EKSClusterName:
     Description: EKS Cluster Name
     Value: !Ref EKSCluster
@@ -99,3 +111,10 @@ Outputs:
     Value: !Ref EKSClusterSecurityGroup
     Export:
       Name: !Sub "${AWS::StackName}-EKSClusterSecurityGroupId"
+
+  # --- NEW: OIDC PROVIDER OUTPUT ---
+  OIDCProviderArn:
+    Description: ARN of the OIDC Provider
+    Value: !Ref OIDCProvider
+    Export:
+      Name: !Sub "${AWS::StackName}-OIDCProviderArn"

@@ -39,7 +39,7 @@ jobs:
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: aurascale-iam
-          template: iam/oidc-provider.yaml
+          template: iam/eks-roles.yaml
 
   deploy-eks:
     needs: deploy-iam
