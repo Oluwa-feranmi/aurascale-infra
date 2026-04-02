@@ -32,8 +32,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Cluster communication with worker nodes
-      VpcId: !ImportValue 
-        Fn::Sub: "${VpcStackName}-vpcid"
+      VpcId: !ImportValue "aurascale-vpcid"S
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 443
