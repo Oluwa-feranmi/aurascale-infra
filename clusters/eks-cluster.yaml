@@ -84,7 +84,7 @@ Resources:
     Type: AWS::IAM::OIDCProvider
     Properties:
       Url: !GetAtt EKSCluster.OpenIdConnectIssuerUrl
-      ClientIDList:
+      ClientIdList:
         - sts.amazonaws.com
       ThumbprintList:
         - 2b18947a6a9fc7764fd8b5fb18a863b0c6dac24f
