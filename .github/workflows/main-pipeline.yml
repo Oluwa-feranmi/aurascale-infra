@@ -58,3 +58,4 @@ jobs:
         with:
           name: aurascale-eks
           template: clusters/eks-cluster.yaml
+          no-fail-on-empty-changeset: "1"

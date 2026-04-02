@@ -27,7 +27,7 @@ Parameters:
       - prod
 
 Resources:
-  # --- YOUR ORIGINAL SECURITY GROUP ---
+  # 1. The Security Group "Shell"
   EKSClusterSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -40,16 +40,23 @@ Resources:
           ToPort: 443
           CidrIp: 0.0.0.0/0
           Description: Allow HTTPS traffic to EKS API server
-        - IpProtocol: "-1"
-          FromPort: -1
-          ToPort: -1
-          SourceSecurityGroupId: !Ref EKSClusterSecurityGroup
-          Description: Allow all traffic within the cluster security group
       Tags:
         - Key: Name
           Value: !Sub "${ClusterName}-cluster-sg"
 
-  # --- YOUR ORIGINAL EKS CLUSTER ---
+  # 2. THE FIX: The Standalone Ingress Rule
+  # This resource "waits" for the shell above to exist, then attaches the rule.
+  EKSClusterIngressRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref EKSClusterSecurityGroup # The target
+      IpProtocol: "-1"
+      FromPort: -1
+      ToPort: -1
+      SourceSecurityGroupId: !Ref EKSClusterSecurityGroup # The source
+      Description: Allow all traffic within the cluster security group
+
+  # 3. The Cluster (Depends on the Shell)
   EKSCluster:
     Type: AWS::EKS::Cluster
     Properties:
@@ -76,7 +83,7 @@ Resources:
             - Type: audit
             - Type: authenticator
 
-  # --- NEW: THE INTEGRATED OIDC PROVIDER ---
+  # 4. The OIDC Provider (Depends on the Cluster)
   OIDCProvider:
     Type: AWS::IAM::OIDCProvider
     Properties:
