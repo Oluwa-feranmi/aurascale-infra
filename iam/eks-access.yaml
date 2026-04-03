@@ -5,7 +5,7 @@ Parameters:
   ClusterStackName:
     Description: Name of the EKS cluster stack to import values from
     Type: String
-    Default: aurascale-cluster
+    Default: aurascale-eks
 
 Resources:
   LocalUserAccessEntry:
