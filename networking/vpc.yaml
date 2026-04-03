@@ -327,76 +327,76 @@ Outputs:
     Description: VPC ID
     Value: !Ref AurascaleVPC
     Export:
-      Name: !Sub "${ProjectName}-vpcid"
+      Name: !Sub "${AWS::StackName}-vpcid"
 
   PublicSubnetAID:
     Description: Public Subnet A ID
     Value: !Ref PublicSubnetA
     Export:
-      Name: !Sub "${ProjectName}-public-subnet-a-id"
+      Name: !Sub "${AWS::StackName}-public-subnet-a-id"
 
   PublicSubnetBID:
     Description: Public Subnet B ID
     Value: !Ref PublicSubnetB
     Export:
-      Name: !Sub "${ProjectName}-public-subnet-b-id"
+      Name: !Sub "${AWS::StackName}-public-subnet-b-id"
 
   PublicSubnetCID:
     Description: Public Subnet C ID
     Value: !Ref PublicSubnetC
     Export:
-      Name: !Sub "${ProjectName}-public-subnet-c-id"
+      Name: !Sub "${AWS::StackName}-public-subnet-c-id"
 
   PrivateSubnetID:
     Description: Private Subnet ID
     Value: !Ref PrivateSubnet
     Export:
-      Name: !Sub "${ProjectName}-private-subnet-id"
+      Name: !Sub "${AWS::StackName}-private-subnet-id"
 
   PrivateSubnet2ID:
     Description: Private Subnet 2 ID
     Value: !Ref PrivateSubnet2
     Export:
-      Name: !Sub "${ProjectName}-private-subnet-2-id"
+      Name: !Sub "${AWS::StackName}-private-subnet-2-id"
 
   PrivateSubnet3ID:
     Description: Private Subnet 3 ID
     Value: !Ref PrivateSubnet3
     Export:
-      Name: !Sub "${ProjectName}-private-subnet-3-id"
+      Name: !Sub "${AWS::StackName}-private-subnet-3-id"
 
   DataSubnetID:
     Description: Data Subnet ID
     Value: !Ref DataSubnet
     Export:
-      Name: !Sub "${ProjectName}-data-subnet-id"
+      Name: !Sub "${AWS::StackName}-data-subnet-id"
 
   DataSubnet2ID:
     Description: Data Subnet 2 ID
     Value: !Ref DataSubnet2
     Export:
-      Name: !Sub "${ProjectName}-data-subnet-2-id"
+      Name: !Sub "${AWS::StackName}-data-subnet-2-id"
 
   DataSubnet3ID:
     Description: Data Subnet 3 ID
     Value: !Ref DataSubnet3
     Export:
-      Name: !Sub "${ProjectName}-data-subnet-3-id"
+      Name: !Sub "${AWS::StackName}-data-subnet-3-id"
 
   PublicRouteTableID:
     Description: Public Route Table ID
     Value: !Ref PublicRouteTable
     Export:
-      Name: !Sub "${ProjectName}-public-route-table-id"
+      Name: !Sub "${AWS::StackName}-public-route-table-id"
 
   PrivateRouteTableID:
     Description: Private Route Table ID
     Value: !Ref PrivateRouteTable
     Export:
-      Name: !Sub "${ProjectName}-private-route-table-id"
+      Name: !Sub "${AWS::StackName}-private-route-table-id"
 
   DataRouteTableID:
     Description: Data Route Table ID
     Value: !Ref DataRouteTable
     Export:
-      Name: !Sub "${ProjectName}-data-route-table-id"
+      Name: !Sub "${AWS::StackName}-data-route-table-id"

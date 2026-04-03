@@ -24,7 +24,7 @@ Parameters:
     Description: The workload type for the node instances
   ClusterStackName:
     Type: String
-    Default: aurascale-control-plane
+    Default: aurascale-eks
     Description: The name of the EKS cluster stack to import values from
   IamStackName:
     Type: String
@@ -32,7 +32,7 @@ Parameters:
     Description: The name of the IAM stack to import values from
   VpcStackName:
     Type: String
-    Default: aurascale-vpcid
+    Default: aurascale-vpc
     Description: The name of the VPC stack to import values from
   NodeInstanceType:
     Type: String
@@ -57,9 +57,12 @@ Resources:
       AmiType: !Ref AmiType
       CapacityType: !Ref CapacityType
       Subnets:
-        - !ImportValue "aurascale-private-subnet-id"
-        - !ImportValue "aurascale-private-subnet-2-id"
-        - !ImportValue "aurascale-private-subnet-3-id"
+        - !ImportValue
+          Fn::Sub: "${VpcStackName}-private-subnet-id"
+        - !ImportValue
+          Fn::Sub: "${VpcStackName}-private-subnet-2-id"
+        - !ImportValue
+          Fn::Sub: "${VpcStackName}-private-subnet-3-id"
       Tags:
         Environment: !Ref Environment
         Workload: !Ref Workload

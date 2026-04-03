@@ -32,7 +32,8 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Cluster communication with worker nodes
-      VpcId: !ImportValue "aurascale-vpcid"
+      VpcId: !ImportValue
+        Fn::Sub: "${VpcStackName}-vpcid"
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 443
@@ -69,9 +70,12 @@ Resources:
         SecurityGroupIds:
           - !Ref EKSClusterSecurityGroup
         SubnetIds:
-          - !ImportValue "aurascale-private-subnet-id"
-          - !ImportValue "aurascale-private-subnet-2-id"
-          - !ImportValue "aurascale-private-subnet-3-id"
+          - !ImportValue
+            Fn::Sub: "${VpcStackName}-private-subnet-id"
+          - !ImportValue
+            Fn::Sub: "${VpcStackName}-private-subnet-2-id"
+          - !ImportValue
+            Fn::Sub: "${VpcStackName}-private-subnet-3-id"
       Logging:
         ClusterLogging:
           EnabledTypes:
