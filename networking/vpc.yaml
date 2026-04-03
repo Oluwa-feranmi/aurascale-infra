@@ -211,6 +211,7 @@ Resources:
 
   NATGateway:
     Type: AWS::EC2::NatGateway
+    DependsOn: ElasticIP
     Properties:
       AllocationId: !GetAtt ElasticIP.AllocationId
       SubnetId: !Ref PublicSubnetA
@@ -254,6 +255,7 @@ Resources:
           
   ElasticIP:
     Type: AWS::EC2::EIP
+    DependsOn: AttachGateway
     Properties:
       Domain: vpc
       Tags:
