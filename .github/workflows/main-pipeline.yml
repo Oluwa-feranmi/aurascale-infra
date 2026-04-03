@@ -78,3 +78,21 @@ jobs:
           template: iam/eks-access.yaml
           capabilities: CAPABILITY_NAMED_IAM
           no-fail-on-empty-changeset: "1"
+
+  deploy-eks-nodes:
+    needs: deploy-eks-iam
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-west-1
+      - name: Deploy EKS Node Group
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: aurascale-eks-nodes
+          template: clusters/eks-nodes.yaml
+          capabilities: CAPABILITY_NAMED_IAM
+          no-fail-on-empty-changeset: "1"

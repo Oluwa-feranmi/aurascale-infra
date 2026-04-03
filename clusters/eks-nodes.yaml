@@ -32,7 +32,7 @@ Parameters:
     Description: The name of the IAM stack to import values from
   VpcStackName:
     Type: String
-    Default: aurascale
+    Default: aurascale-vpcid
     Description: The name of the VPC stack to import values from
   NodeInstanceType:
     Type: String
@@ -57,12 +57,9 @@ Resources:
       AmiType: !Ref AmiType
       CapacityType: !Ref CapacityType
       Subnets:
-        - !ImportValue
-          Fn::Sub: "${VpcStackName}-private-subnet-id"
-        - !ImportValue
-          Fn::Sub: "${VpcStackName}-private-subnet-2-id"
-        - !ImportValue
-          Fn::Sub: "${VpcStackName}-private-subnet-3-id"
+        - !ImportValue "aurascale-private-subnet-id"
+        - !ImportValue "aurascale-private-subnet-2-id"
+        - !ImportValue "aurascale-private-subnet-3-id"
       Tags:
         Environment: !Ref Environment
         Workload: !Ref Workload
