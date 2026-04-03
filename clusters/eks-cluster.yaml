@@ -78,6 +78,8 @@ Resources:
             - Type: api
             - Type: audit
             - Type: authenticator
+      AccessConfig:
+        AuthenticationMode: API_AND_CONFIG_MAP
 
   # 4. The OIDC Provider (Depends on the Cluster)
   OIDCProvider:

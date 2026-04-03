@@ -1,6 +1,23 @@
 AWSTemplateFormatVersion: "2010-09-09"
 
+Parameters:
+  ClusterStackName:
+    Description: Name of the EKS cluster stack to import values from
+    Type: String
+    Default: aurascale-cluster
+
 Resources:
+  LocalUserAccessEntry:
+    Type: AWS::EKS::AccessEntry
+    Properties:
+      ClusterName: !ImportValue
+        Fn::Sub: "${ClusterStackName}-EKSClusterName"
+      PrincipalArn: "arn:aws:iam::224039895487:user/Adedamola"
+      Type: STANDARD
+      AccessPolicies:
+        - PolicyArn: "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          AccessScope:
+            Type: cluster
 
   EksClusterRole:
     Type: AWS::IAM::Role
