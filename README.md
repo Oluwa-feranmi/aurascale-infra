@@ -65,6 +65,15 @@ The infrastructure deployment follows a strict dependency order:
 - **AWS CLI** configured with `AdministratorAccess`.
 - **kubectl** and **helm** installed locally.
 
+## 🚀 Quick Start: Deployment Guide
+
+### 1. Clone the Repository
+```bash
+git clone [https://github.com/your-username/aurascale-infra-core.git](https://github.com/your-username/aurascale-infra-core.git)
+cd aurascale-infra-core
+```
+-- While the GitHub Action automates this on every push, you can deploy the stacks manually using the AWS CLI if needed --
+
 ### Local Cluster Connection
 Run the following to map your local environment to the cloud:
 ```bash
