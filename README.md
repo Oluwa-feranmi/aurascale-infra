@@ -74,18 +74,23 @@ cd aurascale-infra-core
 ```
 -- While the GitHub Action automates this on every push, you can deploy the stacks manually using the AWS CLI if needed --
 
-### Local Cluster Connection
+### 2. Local Cluster Connection
 Run the following to map your local environment to the cloud:
 ```bash
 aws eks update-kubeconfig --region eu-west-1 --name aurascale-control-plane
 ```
-# Check node status
+# 3. Check node status
 ```bash
 kubectl get nodes
 ```
-# Check system health
+# 4. Check system health
 ```bash
 kubectl get pods -n kube-system
+```
+### 5. Bootstrap ArgoCD (GitOps)
+Once the infrastructure is live, deploy the ArgoCD parent application to manage workloads:
+```bash
+kubectl apply -f k8s-config/argo-app.yaml
 ```
 ## 🔐 Security Standards
 Private Compute: All worker nodes are isolated in private subnets.
