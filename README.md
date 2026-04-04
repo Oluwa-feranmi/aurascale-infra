@@ -79,11 +79,11 @@ Run the following to map your local environment to the cloud:
 ```bash
 aws eks update-kubeconfig --region eu-west-1 --name aurascale-control-plane
 ```
-# 3. Check node status
+### 3. Check node status
 ```bash
 kubectl get nodes
 ```
-# 4. Check system health
+### 4. Check system health
 ```bash
 kubectl get pods -n kube-system
 ```
