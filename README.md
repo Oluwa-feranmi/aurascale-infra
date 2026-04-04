@@ -69,7 +69,7 @@ The infrastructure deployment follows a strict dependency order:
 
 ### 1. Clone the Repository
 ```bash
-git clone [https://github.com/your-username/aurascale-infra-core.git](https://github.com/your-username/aurascale-infra-core.git)
+git clone [https://github.com/Oluwa-feranmi/aurascale-infra-core.git]
 cd aurascale-infra-core
 ```
 -- While the GitHub Action automates this on every push, you can deploy the stacks manually using the AWS CLI if needed --
