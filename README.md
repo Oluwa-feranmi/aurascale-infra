@@ -40,9 +40,3 @@ graph TD
         G --> H
     end
 
-Folder,Description,Key Files
-.github/,CI/CD Automation,main-pipeline.yml
-networking/,Core Network Layer,"vpc.yaml (Public/Private Subnets, NATGW)"
-iam/,Identity & Access,"eks-roles.yaml, eks-access.yaml (Access Entries)"
-clusters/,Kubernetes Engine,"eks-cluster.yaml (v1.31), eks-nodes.yaml"
-k8s-config/,Cluster Runtime,"argo-app.yaml, alb-service-account.yaml"
