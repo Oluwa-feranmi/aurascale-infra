@@ -13,23 +13,23 @@ graph TD
     end
 
     subgraph AWS_Cloud [AWS eu-west-1]
-        subgraph Networking
+        subgraph networking
             B[vpc.yaml]
         end
 
-        subgraph IAM_Identity
+        subgraph iam
             C[eks-roles.yaml]
             D[alb-role-stack.yaml]
             E[eks-access.yaml]
         end
 
-        subgraph Compute
+        subgraph clusters
             F[eks-cluster.yaml]
             G[eks-nodes.yaml]
         end
 
-        subgraph K8s_Config
-            H[ArgoCD / argo-app.yaml]
+        subgraph k8s-config
+            H[argo-app.yaml]
             I[alb-service-account.yaml]
         end
 
