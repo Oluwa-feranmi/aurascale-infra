@@ -69,3 +69,20 @@ The infrastructure deployment follows a strict dependency order:
 Run the following to map your local environment to the cloud:
 ```bash
 aws eks update-kubeconfig --region eu-west-1 --name aurascale-control-plane
+```
+# Check node status
+```bash
+kubectl get nodes
+```
+# Check system health
+```bash
+kubectl get pods -n kube-system
+```
+## 🔐 Security Standards
+Private Compute: All worker nodes are isolated in private subnets.
+
+OIDC Integration: Implements IAM Roles for Service Accounts (IRSA) for fine-grained security.
+
+Access Entries: Modern RBAC management via the ``` iam/eks-access.yaml stack.```
+
+Built with 💡 by the AuraScale Platform Team.
