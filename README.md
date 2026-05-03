@@ -100,3 +100,8 @@ OIDC Integration: Implements IAM Roles for Service Accounts (IRSA) for fine-grai
 Access Entries: Modern RBAC management via the ``` iam/eks-access.yaml stack.```
 
 Built with 💡 by the AuraScale Platform Team.
+👤 Author
+Oluwa-feranmi
+Platform & Cloud Engineering Enthusiast | SRE | DevOps Engineer
+
+GitHub: @Oluwa-feranmi
